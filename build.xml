@@ -1,0 +1,60 @@
+<project name="TaskTracker" default="main" basedir=".">
+    <description></description>
+    
+    <property name="src.dir" location="src" />
+    <property name="build.dir" location="build" />
+    <property name="docs.dir" location="docs" />
+    
+    <property name="build.classes.dir" location="${build.dir}/classes" />
+    <property name="build.jar.dir" location="${build.dir}/jar" />
+    
+    <property name="main-class" value="tasktracker.core.Task" />
+    
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp />
+        
+        <!-- Create the build directory structure -->
+        <mkdir dir="${build.classes.dir}" />
+        <mkdir dir="${build.jar.dir}" />
+        <mkdir dir="${docs.dir}" />
+    </target>
+    
+    <target name="clean">
+        <delete dir="${build.dir}" />
+        <delete dir="${docs.dir}" />
+    </target>
+    
+    <target name="build" depends="init">
+        <javac srcdir="${src.dir}" destdir="${build.classes.dir}" />
+    </target>
+    
+    <target name="rebuild" depends="clean,jar" />
+    
+    <target name="jar" depends="build">
+        <jar destfile="${build.jar.dir}/${ant.project.name}.jar"
+             basedir="${build.classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}" />
+            </manifest>
+        </jar>
+    </target>
+    
+    <target name="docs" depends="init">
+        <javadoc    destdir="${docs.dir}"
+                    charset="utf-8"
+                    access="private">
+            <fileset dir="${src.dir}" includes="**/*.java" />
+        </javadoc>
+    </target>
+    
+    <target name="run" depends="jar">
+        <java jar="${build.jar.dir}/${ant.project.name}.jar" fork="true" />
+    </target>
+    
+    <target name="main" depends="clean,run" />
+</project>
+    
+    
+    
+    
