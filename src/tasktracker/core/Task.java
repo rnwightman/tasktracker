@@ -67,11 +67,19 @@ public class Task {
         return this.taskName.toString();
     }
     
+    public Date getStart() {
+        return (Date)this.start.clone();
+    }
+    
+    public Date getEnd() {
+        return (Date)this.end.clone();
+    }
+    
     /**
      * Record the completion of the task at the current date-time.
      */
-    public void completeTask() {
-        completeTask(new Date());
+    public void complete() {
+        complete(new Date());
     }
     
     /**
@@ -79,7 +87,7 @@ public class Task {
      *
      * @param   end the date-time that the task was completed
      */
-    public void completeTask(Date end) {
+    public void complete(Date end) {
         if (this.completed) {
             throw new IllegalStateException("Task already completed.");
         }

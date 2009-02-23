@@ -8,7 +8,7 @@
     <property name="build.classes.dir" location="${build.dir}/classes" />
     <property name="build.jar.dir" location="${build.dir}/jar" />
     
-    <property name="main-class" value="tasktracker.core.Task" />
+    <property name="main-class" value="tasktracker.cli.CommandLineInterface" />
     
     <target name="init">
         <!-- Create the time stamp -->
