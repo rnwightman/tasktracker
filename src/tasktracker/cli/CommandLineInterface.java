@@ -63,6 +63,9 @@ public class CommandLineInterface {
         if (args.length >= 1) {
             taskName = args[0];
         }
+        else {
+            throw new IllegalArgumentException("Must provide a task name");
+        }
         
         Date start = new Date();
         // TODO: Parse date from args
@@ -81,20 +84,32 @@ public class CommandLineInterface {
             if (fileName == null) fileName = "tasktracker.data";
             
             String command = getCommand(args);
-            String[] commandArgs = getCommandArguments(args, command);
+            System.out.println("Command: " + command);
             
-            System.out.println("Command: " + command + " Args: " + commandArgs.length);
+            String[] commandArgs = getCommandArguments(args, command);
+            System.out.println(" Args: " + commandArgs.length);
             
             Engine engine = new Engine(fileName);
             boolean saveAfterCommand = false;
             
             // Handle the commands
-            if ("add".equalsIgnoreCase(command) ||
-                "a".equalsIgnoreCase(command)) {
+            if ("start".equalsIgnoreCase(command) ||
+                "s".equalsIgnoreCase(command)) {
                 saveAfterCommand = true;
                 
                 Task task = createTaskForAdd(commandArgs);
                 engine.addTask(task);
+            }
+            
+            else if ("complete".equalsIgnoreCase(command) ||
+                     "c".equalsIgnoreCase(command)) {
+                boolean taskCompleted = engine.completeCurrentTask(new Date());
+                if (taskCompleted) {
+                    saveAfterCommand = true;
+                }
+                else {
+                    System.err.println("Previous task is not incomplete.");
+                }
             }
             
             else {

@@ -127,6 +127,12 @@ public class Engine {
     }
     
     public void addTask(Task task) {
+        completeCurrentTask(task.getStart());
+        
+        this.tasks.add(task);
+    }
+    
+    public boolean completeCurrentTask(Date completionTime) {
         System.out.println("Existing tasks: " + this.tasks.size());
         
         // Check whether there is a previous task
@@ -137,10 +143,11 @@ public class Engine {
             
             // Complete the task if it is not completed
             if (previousTask.isCompleted() == false) {
-                previousTask.complete(task.getStart());
+                previousTask.complete(completionTime);
+                return true;
             }
         }
         
-        this.tasks.add(task);
+        return false;
     }
 }
