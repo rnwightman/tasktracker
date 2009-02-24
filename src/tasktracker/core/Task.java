@@ -27,7 +27,7 @@ import java.util.*;
  *
  * @author  Ryan Wightman
  */
-public class Task {
+public class Task implements java.lang.Comparable {
     private String taskName;
     private Date start;
     private Date end;
@@ -56,6 +56,16 @@ public class Task {
         this.start = start;
         this.end = end;
         this.completed = true;
+    }
+    
+    public int compareTo(Object o) {
+        if (o instanceof Task) {
+            Task other = (Task)o;
+            return this.getStart().compareTo(other.getStart());
+        }
+        else {
+            throw new ClassCastException();
+        }
     }
     
     /**

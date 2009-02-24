@@ -30,15 +30,35 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Engine provides an API for various user interfaces to manage tasks.
+ */
 public class Engine {
+    /**
+     * Name of the file that this was loaded from
+     */
     protected String fileName;
-    private List<Task> tasks;
+    
+    /**
+     * Set of the tasks
+     */
+    private SortedSet<Task> tasks;
+    
+    /**
+     * Formatter used to read and write date members from the save file.
+     */
     private SimpleDateFormat dateFormatter;
     
+    /**
+     * Create a new Engine, loading the task information from the specified
+     * file.
+     *
+     * @param   fileName    name of the file to load history from
+     */
     public Engine(String fileName)
             throws IOException{
         this.fileName = fileName.toString();
-        tasks = new LinkedList<Task>();
+        tasks = new TreeSet<Task>();
         dateFormatter = new SimpleDateFormat("yyyy.MM.dd HHmmssZ");
         
         try {
@@ -65,6 +85,12 @@ public class Engine {
         }
     }
     
+    /**
+     * Save the current state of the engine. The same file as the engine was
+     * created with will be used.
+     *
+     * @throws  IOException if there is a problem writing to file
+     */
     public void saveState()
         throws IOException {
      
@@ -126,18 +152,30 @@ public class Engine {
         return builder.toString();
     }
     
+    /**
+     * Add a new task to the set of existing tasks. If the previous task has
+     * not been completed it will be using the start time of this task as its
+     * end time.
+     *
+     * @param   task    task to add
+     */
     public void addTask(Task task) {
         completeCurrentTask(task.getStart());
         
         this.tasks.add(task);
     }
     
+    /**
+     * Complete the current (the most recent) task.
+     *
+     * @param   completionTime  the date-time to complete the task with
+     */
     public boolean completeCurrentTask(Date completionTime) {
         System.out.println("Existing tasks: " + this.tasks.size());
         
         // Check whether there is a previous task
-        if (this.tasks.size() > 0) {
-            Task previousTask = this.tasks.get(tasks.size() - 1);
+        if (this.tasks.isEmpty() == false) {
+            Task previousTask = this.tasks.last();
             
             System.out.println("Previous task is complete: " + previousTask.isCompleted());
             
