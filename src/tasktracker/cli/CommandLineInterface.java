@@ -21,6 +21,7 @@ package tasktracker.cli;
 
 import tasktracker.core.Engine;
 import tasktracker.core.Task;
+import java.text.DateFormat;
 import java.util.*;
 
 public class CommandLineInterface {
@@ -73,6 +74,54 @@ public class CommandLineInterface {
         return new Task(taskName, start);
     }
     
+    private static String generateReport(SortedSet<Task> tasks) {
+        TreeMap<Calendar, TreeMap<String, Double>> report = new TreeMap<Calendar, TreeMap<String, Double>>();
+        
+        // tabulate report
+        for (Task task : tasks) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(task.getStart());
+            
+            // determine the date (without time)
+            Calendar date = Calendar.getInstance();
+            date.clear();
+            date.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE));
+            
+            if (!report.containsKey(date)) {
+                report.put(date, new TreeMap<String, Double>());
+            }
+            
+            TreeMap<String, Double> durationsByTaskName = report.get(date);
+            double currentDuration = 0.0;
+            if (durationsByTaskName.containsKey(task.getTaskName())) {
+                currentDuration = durationsByTaskName.get(task.getTaskName()).doubleValue();
+            }
+            
+            currentDuration = currentDuration + task.getDurationInMinutes();
+            durationsByTaskName.put(task.getTaskName(), currentDuration);
+        }
+        
+        // generate report
+        DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.MEDIUM);
+        StringBuilder sb = new StringBuilder();
+        String newLine = System.getProperty("line.separator");
+        for (Calendar date : report.keySet()) {
+            TreeMap<String, Double> durationsByTaskName = report.get(date);
+            
+            sb.append(dateFormatter.format(date.getTime()));
+            sb.append(newLine);
+            
+            for (String taskName : durationsByTaskName.keySet()) {
+                double durationInMinutes = durationsByTaskName.get(taskName);
+                sb.append(taskName + ": " + Double.toString(durationInMinutes));
+                sb.append(newLine);
+            }
+            sb.append(newLine);
+        }
+        
+        return sb.toString();
+    }
+    
     public static void main(String[] args) {
         try {
             if (args.length < 1) {
@@ -84,10 +133,7 @@ public class CommandLineInterface {
             if (fileName == null) fileName = "tasktracker.data";
             
             String command = getCommand(args);
-            System.out.println("Command: " + command);
-            
             String[] commandArgs = getCommandArguments(args, command);
-            System.out.println(" Args: " + commandArgs.length);
             
             Engine engine = new Engine(fileName);
             boolean saveAfterCommand = false;
@@ -110,6 +156,14 @@ public class CommandLineInterface {
                 else {
                     System.err.println("Previous task is not incomplete.");
                 }
+            }
+            
+            else if ("report".equalsIgnoreCase(command) ||
+                     "r".equalsIgnoreCase(command)) {
+                SortedSet<Task> tasks = engine.getTasks();
+                String report = generateReport(tasks);
+                
+                System.out.println(report);
             }
             
             else {

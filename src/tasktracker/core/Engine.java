@@ -169,15 +169,12 @@ public class Engine {
      * Complete the current (the most recent) task.
      *
      * @param   completionTime  the date-time to complete the task with
+     * @return  whether a task was completed
      */
     public boolean completeCurrentTask(Date completionTime) {
-        System.out.println("Existing tasks: " + this.tasks.size());
-        
         // Check whether there is a previous task
         if (this.tasks.isEmpty() == false) {
             Task previousTask = this.tasks.last();
-            
-            System.out.println("Previous task is complete: " + previousTask.isCompleted());
             
             // Complete the task if it is not completed
             if (previousTask.isCompleted() == false) {
@@ -187,5 +184,32 @@ public class Engine {
         }
         
         return false;
+    }
+    
+    /**
+     * Get the set of all tasks.
+     *
+     * @return  all tasks
+     */
+    public SortedSet<Task> getTasks() {
+        return getTasksSince(new Date(0));
+    }
+    
+    /**
+     * Get the set of tasks that have occurred since the specified date.
+     *
+     * @param   earliest    the earliest date of the tasks to be retrieved
+     * @return  all tasks that have occurred since the specified date
+     */
+    public SortedSet<Task> getTasksSince(Date earliest) {
+        SortedSet<Task> recentTasks = new TreeSet<Task>();
+        
+        for (Task task : tasks) {
+            if (task.getStart().after(earliest)) {
+                recentTasks.add(task);
+            }
+        }
+        
+        return recentTasks;
     }
 }

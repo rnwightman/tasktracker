@@ -1,4 +1,4 @@
-/*
+ /*
     TaskTracker is a utility to track and report time spent on tasks.
     
     This file is part of TaskTracker
