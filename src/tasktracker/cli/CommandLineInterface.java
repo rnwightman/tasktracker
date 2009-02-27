@@ -74,6 +74,13 @@ public class CommandLineInterface {
         return new Task(taskName, start);
     }
     
+    private static String formatMinutes(double minutes) {
+        int hours = (int)(minutes / 60.0);
+        int remainingMinutes = (int)(minutes % 60.0);
+        
+        return String.format("%1$02d:%2$02d", hours, remainingMinutes);
+    }
+    
     private static String generateReport(SortedSet<Task> tasks) {
         TreeMap<Calendar, TreeMap<String, Double>> report = new TreeMap<Calendar, TreeMap<String, Double>>();
         
@@ -107,15 +114,18 @@ public class CommandLineInterface {
         String newLine = System.getProperty("line.separator");
         for (Calendar date : report.keySet()) {
             TreeMap<String, Double> durationsByTaskName = report.get(date);
+            double totalMinutes = 0.0;
             
             sb.append(dateFormatter.format(date.getTime()));
             sb.append(newLine);
             
             for (String taskName : durationsByTaskName.keySet()) {
                 double durationInMinutes = durationsByTaskName.get(taskName);
-                sb.append(taskName + ": " + Double.toString(durationInMinutes));
+                totalMinutes += durationInMinutes;
+                sb.append(taskName + ": " + formatMinutes(durationInMinutes));
                 sb.append(newLine);
             }
+            sb.append("Total: " + formatMinutes(totalMinutes) + newLine);
             sb.append(newLine);
         }
         
