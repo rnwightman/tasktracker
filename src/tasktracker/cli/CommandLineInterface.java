@@ -78,7 +78,7 @@ public class CommandLineInterface {
         int hours = (int)(minutes / 60.0);
         int remainingMinutes = (int)(minutes % 60.0);
         
-        return String.format("%1$02d:%2$02d", hours, remainingMinutes);
+        return String.format("%1$d:%2$02d", hours, remainingMinutes);
     }
     
     private static String generateReport(SortedSet<Task> tasks) {
@@ -95,7 +95,7 @@ public class CommandLineInterface {
             date.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE));
             
             if (!report.containsKey(date)) {
-                report.put(date, new TreeMap<String, Double>());
+                report.put(date, new TreeMap<String, Double>(String.CASE_INSENSITIVE_ORDER));
             }
             
             TreeMap<String, Double> durationsByTaskName = report.get(date);
@@ -109,22 +109,30 @@ public class CommandLineInterface {
         }
         
         // generate report
-        DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.MEDIUM);
+        DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.FULL);
+        
         StringBuilder sb = new StringBuilder();
         String newLine = System.getProperty("line.separator");
+        
+        // Loop through all the dates in the task set
         for (Calendar date : report.keySet()) {
             TreeMap<String, Double> durationsByTaskName = report.get(date);
             double totalMinutes = 0.0;
-            
+        
+            // Write daily header    
             sb.append(dateFormatter.format(date.getTime()));
             sb.append(newLine);
             
+            // Write out each task
             for (String taskName : durationsByTaskName.keySet()) {
                 double durationInMinutes = durationsByTaskName.get(taskName);
                 totalMinutes += durationInMinutes;
+                
                 sb.append(taskName + ": " + formatMinutes(durationInMinutes));
                 sb.append(newLine);
             }
+            
+            // Write out the daily total
             sb.append("Total: " + formatMinutes(totalMinutes) + newLine);
             sb.append(newLine);
         }
